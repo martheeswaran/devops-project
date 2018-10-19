@@ -1,0 +1,42 @@
+- name: install the latest version of Apache
+  yum:
+    name: httpd
+    state: latest
+
+- name: copy index.html to the folder
+  copy:
+    src: "{{ role_path }}/files/index.html"
+    dest: /var/www/html/index.html
+
+- name: Reload service httpd, in all cases
+  service:
+    name: httpd
+    state: started
+
+- name: copy openssl certificate to the folder
+  copy:
+    src: "{{ role_path }}/files/{{ item }}"
+    dest: "/home/ec2-user/{{ item }}"
+  with_items:
+    - cert.pem
+    - newkey.pem
+
+- name: mod ssl install
+  yum:
+    name: mod_ssl
+    state: latest
+
+- name: copy updated conf file to the existing apache folder
+  template:
+    src: "{{ role_path }}/templates/httpd.conf"
+    dest: /etc/httpd/conf/httpd.conf
+
+- name: Reload service httpd, in all cases
+  service:
+    name: httpd
+    state: reloaded
+
+- name: Start service httpd, if not started
+  service:
+    name: httpd
+    state: restarted

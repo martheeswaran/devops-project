@@ -1,0 +1,6 @@
+---
+- name: setup everything
+  hosts: "{{ ip_address }}"
+  gather_facts: no
+  roles:
+    - webserver 
